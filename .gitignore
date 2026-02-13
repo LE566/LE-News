@@ -29,6 +29,10 @@ log.txt
 /out-tsc
 /bazel-out
 
+# Environments (Secrets)
+src/environments/environment.ts
+src/environments/environment.prod.ts
+
 # Node
 /node_modules
 npm-debug.log

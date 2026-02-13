@@ -1,2 +1,146 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// ===== LE News — Theme Variables =====
+
+:root {
+    --ion-color-primary: #4F46E5;
+    --ion-color-primary-rgb: 79, 70, 229;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #4338CA;
+    --ion-color-primary-tint: #6366F1;
+
+    --ion-color-secondary: #10B981;
+    --ion-color-secondary-rgb: 16, 185, 129;
+    --ion-color-secondary-contrast: #ffffff;
+    --ion-color-secondary-contrast-rgb: 255, 255, 255;
+    --ion-color-secondary-shade: #059669;
+    --ion-color-secondary-tint: #34D399;
+
+    --ion-color-tertiary: #F59E0B;
+    --ion-color-tertiary-rgb: 245, 158, 11;
+    --ion-color-tertiary-contrast: #000000;
+    --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+    --ion-color-tertiary-shade: #D97706;
+    --ion-color-tertiary-tint: #FBBF24;
+
+    --ion-color-success: #10B981;
+    --ion-color-success-rgb: 16, 185, 129;
+    --ion-color-success-contrast: #ffffff;
+    --ion-color-success-contrast-rgb: 255, 255, 255;
+    --ion-color-success-shade: #059669;
+    --ion-color-success-tint: #34D399;
+
+    --ion-color-danger: #EF4444;
+    --ion-color-danger-rgb: 239, 68, 68;
+    --ion-color-danger-contrast: #ffffff;
+    --ion-color-danger-contrast-rgb: 255, 255, 255;
+    --ion-color-danger-shade: #DC2626;
+    --ion-color-danger-tint: #F87171;
+
+    --ion-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    // Text size CSS vars (default = medium)
+    --le-body-size: 1rem;
+    --le-title-size: 1.1rem;
+    --le-card-title-size: 0.95rem;
+    --le-small-size: 0.78rem;
+}
+
+// Dark theme variables — shared mixin
+@mixin dark-theme {
+    --ion-background-color: #0F172A;
+    --ion-background-color-rgb: 15, 23, 42;
+
+    --ion-text-color: #F1F5F9;
+    --ion-text-color-rgb: 241, 245, 249;
+
+    --ion-color-step-50: #1E293B;
+    --ion-color-step-100: #253246;
+    --ion-color-step-150: #2C3B51;
+    --ion-color-step-200: #334155;
+    --ion-color-step-250: #3a4a60;
+    --ion-color-step-300: #41536b;
+    --ion-color-step-350: #485c76;
+    --ion-color-step-400: #4F6581;
+    --ion-color-step-450: #566e8c;
+    --ion-color-step-500: #64748B;
+    --ion-color-step-550: #6e7e96;
+    --ion-color-step-600: #7888A1;
+    --ion-color-step-650: #8292AC;
+    --ion-color-step-700: #8C9CB7;
+    --ion-color-step-750: #96A6C2;
+    --ion-color-step-800: #A0B0CD;
+    --ion-color-step-850: #AABAD8;
+    --ion-color-step-900: #B4C4E3;
+    --ion-color-step-950: #BECEEE;
+
+    --ion-color-medium: #94A3B8;
+    --ion-color-medium-rgb: 148, 163, 184;
+    --ion-color-light: #F8FAFC;
+    --ion-color-light-rgb: 248, 250, 252;
+    --ion-color-dark: #F1F5F9;
+    --ion-color-dark-rgb: 241, 245, 249;
+
+    --ion-card-background: #1E293B;
+}
+
+// System dark mode
+@media (prefers-color-scheme: dark) {
+    :root {
+        @include dark-theme;
+    }
+}
+
+// Manual dark mode toggle (overrides system)
+body.dark {
+    @include dark-theme;
+}
+
+// Force light mode when toggle is off (even if system is dark)
+body.light {
+    --ion-background-color: #ffffff;
+    --ion-background-color-rgb: 255, 255, 255;
+    --ion-text-color: #1E293B;
+    --ion-text-color-rgb: 30, 41, 59;
+    --ion-card-background: #ffffff;
+
+    --ion-color-medium: #64748B;
+    --ion-color-medium-rgb: 100, 116, 139;
+    --ion-color-light: #F8FAFC;
+    --ion-color-light-rgb: 248, 250, 252;
+    --ion-color-dark: #1E293B;
+    --ion-color-dark-rgb: 30, 41, 59;
+
+    --ion-color-step-50: #f7f7f7;
+    --ion-color-step-100: #eeeeee;
+    --ion-color-step-150: #e6e6e6;
+    --ion-color-step-200: #dddddd;
+    --ion-color-step-300: #cccccc;
+    --ion-color-step-400: #bbbbbb;
+    --ion-color-step-500: #aaaaaa;
+    --ion-color-step-600: #999999;
+    --ion-color-step-700: #888888;
+    --ion-color-step-800: #777777;
+    --ion-color-step-900: #666666;
+}
+
+// ===== Text Size Overrides =====
+body.text-small {
+    --le-body-size: 0.85rem;
+    --le-title-size: 1rem;
+    --le-card-title-size: 0.85rem;
+    --le-small-size: 0.72rem;
+}
+
+body.text-medium {
+    --le-body-size: 1rem;
+    --le-title-size: 1.1rem;
+    --le-card-title-size: 0.95rem;
+    --le-small-size: 0.78rem;
+}
+
+body.text-large {
+    --le-body-size: 1.15rem;
+    --le-title-size: 1.3rem;
+    --le-card-title-size: 1.1rem;
+    --le-small-size: 0.88rem;
+}

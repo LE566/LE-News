@@ -1,37 +1,311 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
+// ===== LE News — Global Styles =====
 
-/* Core CSS required for Ionic components to work properly */
+/* Core Ionic CSS Required */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+/* Optional Ionic CSS */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+// Global resets
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+// Image defaults
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+// Global ion-card
+ion-card {
+  --border-radius: 20px;
+}
+
+// H1 defaults
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Inter', sans-serif;
+}
+
+// Toolbar
+ion-toolbar {
+  --padding-start: 10px;
+  --padding-end: 10px;
+
+  ion-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.3px;
+  }
+}
+
+// ===== Premium Toast =====
+ion-toast {
+  --border-radius: 16px;
+  --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+
+  &::part(message) {
+    font-weight: 600;
+  }
+}
+
+// Button global
+ion-button {
+  --transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+// ===== Premium Alert =====
+ion-alert {
+  --backdrop-opacity: 0.45;
+
+  .alert-wrapper {
+    border-radius: 24px !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden;
+    max-width: 320px;
+    padding: 0;
+  }
+
+  .alert-head {
+    background: linear-gradient(135deg, #4F46E5, #6366F1);
+    padding: 24px 24px 18px !important;
+    text-align: center;
+
+    .alert-title {
+      color: white !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.3px;
+    }
+
+    .alert-sub-title {
+      color: rgba(255, 255, 255, 0.85) !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      margin-top: 4px;
+    }
+  }
+
+  .alert-message {
+    padding: 20px 24px 10px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    color: var(--ion-text-color) !important;
+    text-align: center;
+  }
+
+  .alert-input-group {
+    padding: 0 24px !important;
+
+    .alert-input-wrapper {
+      border-radius: 14px !important;
+      border: 2px solid var(--ion-color-step-100) !important;
+      margin-bottom: 8px;
+      overflow: hidden;
+
+      input {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.95rem !important;
+        padding: 14px 16px !important;
+
+        &:focus {
+          border-color: var(--ion-color-primary) !important;
+        }
+      }
+    }
+  }
+
+  .alert-button-group {
+    padding: 8px 20px 20px !important;
+    flex-direction: column !important;
+    gap: 6px;
+
+    .alert-button {
+      border-radius: 14px !important;
+      font-family: 'Inter', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 0.92rem !important;
+      text-transform: none !important;
+      min-height: 48px;
+      margin: 0 !important;
+      border: none !important;
+
+      .alert-button-inner {
+        justify-content: center;
+      }
+
+      // Primary action button
+      &:last-child:not(:only-child) {
+        background: linear-gradient(135deg, #4F46E5, #6366F1) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+      }
+
+      // Cancel / secondary button
+      &:first-child:not(:only-child) {
+        background: var(--ion-color-step-50, #f0f0f0) !important;
+        color: var(--ion-color-step-600, #555) !important;
+      }
+
+      // Single button (OK)
+      &:only-child {
+        background: linear-gradient(135deg, #4F46E5, #6366F1) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+      }
+    }
+  }
+
+  // Danger alert variant
+  &.alert-danger {
+    .alert-head {
+      background: linear-gradient(135deg, #EF4444, #F87171);
+    }
+
+    .alert-button-group {
+
+      .alert-button:last-child:not(:only-child),
+      .alert-button:only-child {
+        background: linear-gradient(135deg, #EF4444, #F87171) !important;
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+      }
+    }
+  }
+
+  // Success alert variant
+  &.alert-success {
+    .alert-head {
+      background: linear-gradient(135deg, #10B981, #34D399);
+    }
+
+    .alert-button-group {
+
+      .alert-button:last-child:not(:only-child),
+      .alert-button:only-child {
+        background: linear-gradient(135deg, #10B981, #34D399) !important;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+      }
+    }
+  }
+}
+
+// ===== Premium Action Sheet =====
+ion-action-sheet {
+  --backdrop-opacity: 0.4;
+
+  .action-sheet-group {
+    border-radius: 20px !important;
+    margin: 8px;
+    overflow: hidden;
+    padding: 4px 0;
+
+    .action-sheet-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--ion-text-color);
+      padding: 20px 16px 12px;
+    }
+
+    .action-sheet-button {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      height: 56px;
+
+      &.action-sheet-destructive {
+        color: #EF4444;
+      }
+    }
+  }
+}
+
+// Toggle
+ion-toggle {
+  --track-background-checked: var(--ion-color-primary);
+}
+
+// Segment
+ion-segment {
+  font-family: 'Inter', sans-serif;
+}
+
+// Back button
+ion-back-button {
+  --icon-font-size: 24px;
+}
+
+// ===== Premium Loading =====
+ion-loading {
+  .loading-wrapper {
+    border-radius: 20px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15) !important;
+    padding: 28px 36px !important;
+
+    .loading-content {
+      font-family: 'Inter', sans-serif !important;
+      font-weight: 600 !important;
+      font-size: 0.9rem !important;
+    }
+  }
+}
+
+// Transparent modal for custom alerts
+.transparent-modal {
+  --background: transparent;
+  --box-shadow: none;
+
+  &::part(content) {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  ion-content {
+    --background: transparent;
+  }
+}

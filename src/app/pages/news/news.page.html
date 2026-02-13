@@ -1,0 +1,120 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="main-header">
+    <ion-buttons slot="start">
+      <div class="header-brand">
+        <img src="assets/icon/favicon.png" alt="LE News" class="header-logo" />
+        <span class="header-title">LE News</span>
+      </div>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button class="notification-btn" (click)="openNotifications()">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        <span class="notification-dot"></span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="news-content">
+  <div class="background-blob"></div>
+
+  <!-- Category Scroll -->
+  <div class="category-scroll">
+    @for (cat of categories; track cat) {
+    <div class="category-chip" [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">
+      {{ cat }}
+    </div>
+    }
+  </div>
+
+  <ion-refresher slot="fixed" (ionRefresh)="loadNews($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline"
+      refreshingSpinner="circles"></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="news-wrapper ion-padding">
+    <div class="section-header">
+      <p class="date-label">{{ today | date:'EEEE, d MMMM' }}</p>
+      <h2>Top Headlines</h2>
+    </div>
+
+    <!-- Featured Article (First item) -->
+    @if (articles.length > 0) {
+    <div class="featured-article" (click)="openDetail(articles[0])">
+      <div class="featured-image"
+        [style.backgroundImage]="'url(' + (articles[0].urlToImage || 'assets/placeholder.jpg') + ')'">
+        <div class="featured-overlay">
+          <span class="badge">{{ articles[0].source.name }}</span>
+          <h3>{{ articles[0].title }}</h3>
+          <div class="featured-meta">
+            <span>{{ articles[0].publishedAt | date:'shortTime' }}</span>
+            @if (articles[0].author) {
+            <span class="dot">·</span>
+            <span>{{ articles[0].author }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Trending Label -->
+    @if (articles.length > 1) {
+    <div class="trending-label">
+      <ion-icon name="newspaper-outline"></ion-icon>
+      <span>Latest Stories</span>
+    </div>
+    }
+
+    <!-- Grid for remaining items -->
+    <div class="news-grid">
+      @for (article of articles.slice(1); track article.url) {
+      <ion-card (click)="openDetail(article)" class="news-card">
+        @if (article.urlToImage) {
+        <div class="card-image-wrapper">
+          <img [src]="article.urlToImage" loading="lazy" />
+        </div>
+        }
+        <ion-card-header>
+          <div class="source-row">
+            <span class="source-tag">{{ article.source.name }}</span>
+            <span class="time-tag">{{ article.publishedAt | date:'shortTime' }}</span>
+          </div>
+          <ion-card-title>{{ article.title }}</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+      }
+    </div>
+
+    <!-- Empty State -->
+    @if (!loading && articles.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-wrapper">
+        <ion-icon name="newspaper-outline"></ion-icon>
+      </div>
+      <h3>No news available</h3>
+      <p>Pull down to refresh or try a different category</p>
+      <ion-button fill="outline" shape="round" size="small" (click)="loadNews()">
+        Try Again
+      </ion-button>
+    </div>
+    }
+
+    <!-- Loading Skeletons -->
+    @if (loading) {
+    <div class="news-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+      <ion-card class="news-card skeleton-card">
+        <ion-skeleton-text [animated]="true" style="width: 100%; height: 160px;"></ion-skeleton-text>
+        <ion-card-header>
+          <ion-skeleton-text [animated]="true" style="width: 30%; height: 14px;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 90%; height: 18px; margin-top: 12px;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 60%; height: 18px; margin-top: 6px;"></ion-skeleton-text>
+        </ion-card-header>
+      </ion-card>
+      }
+    </div>
+    }
+
+  </div>
+</ion-content>

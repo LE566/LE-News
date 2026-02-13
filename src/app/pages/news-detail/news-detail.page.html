@@ -1,0 +1,74 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="main-header">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/news"></ion-back-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons slot="end">
+      <ion-button [color]="isBookmarked ? 'primary' : 'medium'" (click)="toggleBookmark()">
+        <ion-icon slot="icon-only" [name]="isBookmarked ? 'bookmark' : 'bookmark-outline'"></ion-icon>
+      </ion-button>
+      <ion-button color="medium" (click)="openOriginal(article?.url || '')">
+        <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+@if (article) {
+<ion-content [fullscreen]="true" class="detail-content">
+  <div class="article-container">
+    @if (article.urlToImage) {
+    <div class="header-image-wrapper">
+      <img [src]="article.urlToImage" alt="Article Image" />
+    </div>
+    }
+
+    <div class="article-content ion-padding">
+      <div class="article-meta">
+        <span class="source-badge">{{ article.source.name }}</span>
+        <span class="date">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ article.publishedAt | date:'mediumDate' }}
+        </span>
+      </div>
+
+      <h1>{{ article.title }}</h1>
+
+      @if (article.author) {
+      <div class="author-row">
+        <ion-avatar>
+          <img src="https://ui-avatars.com/api/?name={{ article.author }}&background=6366F1&color=fff" alt="Author" />
+        </ion-avatar>
+        <div class="author-info">
+          <span class="by">Written by</span>
+          <span class="name">{{ article.author }}</span>
+        </div>
+        <span class="read-time">
+          <ion-icon name="time-outline"></ion-icon>
+          3 min read
+        </span>
+      </div>
+      }
+
+      <div class="divider"></div>
+
+      <div class="article-body">
+        @if (article.description) {
+        <p class="lead">{{ article.description }}</p>
+        }
+        <p class="content-text">{{ article.content || 'Read the full story to see more details.' }}</p>
+      </div>
+
+      <ion-button expand="block" shape="round" class="read-more-btn" (click)="openOriginal(article.url)">
+        Read Full Story
+        <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+      </ion-button>
+
+      <div class="powered-by ion-text-center">
+        <p>Powered by <strong>LE News</strong></p>
+      </div>
+    </div>
+  </div>
+</ion-content>
+}
