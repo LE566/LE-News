@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonSearchbar, IonIcon, IonCard, IonCardHeader,
-  IonCardTitle, IonButton, IonSpinner
+  IonCardTitle, IonSpinner
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { NewsService, Article } from '../../core/services/news.service';
@@ -355,7 +355,7 @@ import { DatePipe } from '@angular/common';
   imports: [
     FormsModule, DatePipe,
     IonContent, IonHeader, IonToolbar, IonSearchbar, IonIcon, IonCard, IonCardHeader,
-    IonCardTitle, IonButton, IonSpinner
+    IonCardTitle, IonSpinner
   ]
 })
 export class SearchPage {

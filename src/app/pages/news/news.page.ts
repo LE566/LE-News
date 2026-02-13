@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonIcon, IonRefresher, IonRefresherContent, IonCard, IonCardHeader,
-  IonCardTitle, IonSkeletonText, ModalController
+  IonCardTitle, IonSkeletonText, ModalController, IonInfiniteScroll, IonInfiniteScrollContent, ToastController
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { NewsService, Article } from '../../core/services/news.service';
@@ -16,16 +16,17 @@ import { NotificationsModal } from '../notifications/notifications.modal';
   styleUrls: ['./news.page.scss'],
   standalone: true,
   imports: [
-    FormsModule, DatePipe,
+    DatePipe,
     IonContent, IonHeader, IonToolbar, IonButtons, IonButton,
     IonIcon, IonRefresher, IonRefresherContent, IonCard, IonCardHeader,
-    IonCardTitle, IonSkeletonText
+    IonCardTitle, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent
   ]
 })
 export class NewsPage implements OnInit {
   articles: Article[] = [];
   loading = true;
   today = new Date();
+  page = 1;
 
   categories = ['General', 'Business', 'Technology', 'Entertainment', 'Health', 'Science', 'Sports'];
   selectedCategory = 'General';
@@ -34,6 +35,7 @@ export class NewsPage implements OnInit {
     private newsService: NewsService,
     private router: Router,
     private modalCtrl: ModalController,
+    private toastCtrl: ToastController
   ) { }
 
   ngOnInit() {
@@ -44,24 +46,57 @@ export class NewsPage implements OnInit {
     return localStorage.getItem('le_news_region') || 'us';
   }
 
-  async loadNews(event?: any) {
+  async loadNews(event?: any, isInfinite: boolean = false) {
     if (!event) {
       this.loading = true;
     }
 
     const region = this.getRegionCode();
-    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase()).subscribe({
+
+    // Reset page on refresh or category change (not infinite scroll)
+    if (!isInfinite) {
+      this.page = 1;
+    }
+
+    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase(), this.page).subscribe({
       next: (data) => {
-        this.articles = data.filter(a => a.urlToImage);
+        // Allow articles without images, handled in template
+        const newArticles = data;
+
+        if (this.page === 1) {
+          this.articles = newArticles;
+        } else {
+          this.articles.push(...newArticles);
+        }
+
         this.loading = false;
         if (event) event.target.complete();
+
+        // Disable infinite scroll if no more data
+        if (isInfinite && newArticles.length === 0 && event) {
+          event.target.disabled = true;
+        }
       },
-      error: (err) => {
+      error: async (err) => {
         console.error(err);
         this.loading = false;
         if (event) event.target.complete();
+
+        const toast = await this.toastCtrl.create({
+          message: 'Could not load news. Check your connection',
+          duration: 3000,
+          color: 'danger',
+          position: 'bottom',
+          icon: 'alert-circle-outline'
+        });
+        await toast.present();
       }
     });
+  }
+
+  loadMore(event: any) {
+    this.page++;
+    this.loadNews(event, true);
   }
 
   selectCategory(category: string) {

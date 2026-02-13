@@ -3,6 +3,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonIcon, IonBackButton, IonAvatar, ToastController
 } from '@ionic/angular/standalone';
+import { Share } from '@capacitor/share';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { NewsService, Article } from '../../core/services/news.service';
@@ -56,9 +57,20 @@ export class NewsDetailPage implements OnInit {
     }
   }
 
-  openOriginal(url: string) {
+  async shareArticle() {
+    if (this.article) {
+      await Share.share({
+        title: this.article.title,
+        text: 'Check out this news!',
+        url: this.article.url,
+        dialogTitle: 'Share with buddies',
+      });
+    }
+  }
+
+  openOriginal(url: string | undefined) {
     if (url) {
-      window.open(url, '_blank');
+      window.open(url, '_system');
     }
   }
 }

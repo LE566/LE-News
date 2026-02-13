@@ -8,7 +8,7 @@
       <ion-button [color]="isBookmarked ? 'primary' : 'medium'" (click)="toggleBookmark()">
         <ion-icon slot="icon-only" [name]="isBookmarked ? 'bookmark' : 'bookmark-outline'"></ion-icon>
       </ion-button>
-      <ion-button color="medium" (click)="openOriginal(article?.url || '')">
+      <ion-button color="medium" (click)="shareArticle()">
         <ion-icon slot="icon-only" name="share-outline"></ion-icon>
       </ion-button>
     </ion-buttons>

@@ -2,35 +2,35 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-    IonIcon, IonButton, ModalController
+  IonIcon, ModalController
 } from '@ionic/angular/standalone';
 
 export interface CustomAlertButton {
-    text: string;
-    role?: 'cancel' | 'confirm' | 'destructive';
-    handler?: (data?: any) => void;
+  text: string;
+  role?: 'cancel' | 'confirm' | 'destructive';
+  handler?: (data?: any) => void;
 }
 
 export interface CustomAlertRadio {
-    label: string;
-    value: string;
-    checked?: boolean;
+  label: string;
+  value: string;
+  checked?: boolean;
 }
 
 export interface CustomAlertConfig {
-    icon?: string;
-    title: string;
-    subtitle?: string;
-    message?: string;
-    color?: 'primary' | 'danger' | 'success' | 'warning';
-    inputs?: { name: string; type: string; placeholder: string }[];
-    radios?: CustomAlertRadio[];
-    buttons: CustomAlertButton[];
+  icon?: string;
+  title: string;
+  subtitle?: string;
+  message?: string;
+  color?: 'primary' | 'danger' | 'success' | 'warning';
+  inputs?: { name: string; type: string; placeholder: string }[];
+  radios?: CustomAlertRadio[];
+  buttons: CustomAlertButton[];
 }
 
 @Component({
-    selector: 'app-custom-alert',
-    template: `
+  selector: 'app-custom-alert',
+  template: `
     <div class="alert-backdrop" (click)="onBackdropClick()">
       <div class="alert-card" [class]="'alert-card color-' + (config.color || 'primary')" (click)="$event.stopPropagation()">
 
@@ -101,7 +101,7 @@ export interface CustomAlertConfig {
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .alert-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -328,39 +328,39 @@ export interface CustomAlertConfig {
       }
     }
   `],
-    standalone: true,
-    imports: [CommonModule, FormsModule, IonIcon, IonButton]
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonIcon]
 })
 export class CustomAlertComponent {
-    @Input() config!: CustomAlertConfig;
+  @Input() config!: CustomAlertConfig;
 
-    inputValues: Record<string, string> = {};
-    selectedRadio = '';
+  inputValues: Record<string, string> = {};
+  selectedRadio = '';
 
-    constructor(private modalCtrl: ModalController) { }
+  constructor(private modalCtrl: ModalController) { }
 
-    ngOnInit() {
-        if (this.config.radios) {
-            const checked = this.config.radios.find(r => r.checked);
-            if (checked) this.selectedRadio = checked.value;
-        }
+  ngOnInit() {
+    if (this.config.radios) {
+      const checked = this.config.radios.find(r => r.checked);
+      if (checked) this.selectedRadio = checked.value;
     }
+  }
 
-    onBackdropClick() {
-        const cancelBtn = this.config.buttons.find(b => b.role === 'cancel');
-        if (cancelBtn) {
-            this.modalCtrl.dismiss(null, 'cancel');
-        }
+  onBackdropClick() {
+    const cancelBtn = this.config.buttons.find(b => b.role === 'cancel');
+    if (cancelBtn) {
+      this.modalCtrl.dismiss(null, 'cancel');
     }
+  }
 
-    onButtonClick(btn: CustomAlertButton) {
-        if (btn.role === 'cancel') {
-            if (btn.handler) btn.handler();
-            this.modalCtrl.dismiss(null, 'cancel');
-        } else {
-            const data = this.config.radios ? this.selectedRadio : this.inputValues;
-            if (btn.handler) btn.handler(data);
-            this.modalCtrl.dismiss(data, 'confirm');
-        }
+  onButtonClick(btn: CustomAlertButton) {
+    if (btn.role === 'cancel') {
+      if (btn.handler) btn.handler();
+      this.modalCtrl.dismiss(null, 'cancel');
+    } else {
+      const data = this.config.radios ? this.selectedRadio : this.inputValues;
+      if (btn.handler) btn.handler(data);
+      this.modalCtrl.dismiss(data, 'confirm');
     }
+  }
 }

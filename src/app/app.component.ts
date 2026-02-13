@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { Platform } from '@ionic/angular/standalone';
+import { Platform, ToastController } from '@ionic/angular/standalone';
+import { Network } from '@capacitor/network';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,16 @@ import { Platform } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
-  constructor(private platform: Platform) { }
+  constructor(private platform: Platform, private toastCtrl: ToastController) { }
 
   async ngOnInit() {
     // Apply saved theme preferences on startup
     this.applyThemeOnStartup();
+
+    // Listen for network changes
+    Network.addListener('networkStatusChange', status => {
+      this.presentNetworkToast(status.connected);
+    });
 
     if (this.platform.is('capacitor')) {
       try {
@@ -25,6 +31,19 @@ export class AppComponent implements OnInit {
       } catch (e) {
         console.log('StatusBar not available', e);
       }
+    }
+  }
+
+  async presentNetworkToast(connected: boolean) {
+    if (!connected) {
+      const toast = await this.toastCtrl.create({
+        message: 'You are offline!',
+        duration: 3000,
+        position: 'bottom',
+        color: 'danger',
+        icon: 'alert-circle-outline'
+      });
+      await toast.present();
     }
   }
 
@@ -40,6 +59,7 @@ export class AppComponent implements OnInit {
     // Text size
     const textSize = localStorage.getItem('le_news_text_size') || 'medium';
     document.body.classList.remove('text-small', 'text-medium', 'text-large');
+    document.body.classList.add('text-' + textSize);
     document.body.classList.add('text-' + textSize);
   }
 }

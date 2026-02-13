@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton,
-  IonIcon, IonItem, IonLabel, IonToggle, IonButton, ToastController
+  IonIcon, IonItem, IonLabel, IonToggle, ToastController
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CustomAlertService } from '../../shared/custom-alert.service';
@@ -265,7 +265,7 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
   imports: [
     FormsModule,
     IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton,
-    IonIcon, IonItem, IonLabel, IonToggle, IonButton
+    IonIcon, IonItem, IonLabel, IonToggle
   ]
 })
 export class SettingsPage implements OnInit {
