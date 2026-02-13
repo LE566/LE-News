@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http'; // Keep for now if used elsewhere, but we are replacing usage
+import { BehaviorSubject, Observable, of, from } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { CapacitorHttp, HttpResponse } from '@capacitor/core';
 
 import { environment } from 'src/environments/environment';
 
@@ -31,32 +32,75 @@ export class NewsService {
 
   constructor(private http: HttpClient) { }
 
-  getTopHeadlines(country = 'us', category = 'general', page = 1, pageSize = 20): Observable<Article[]> {
+  getTopHeadlines(country = 'us', category = 'general', page = 1, pageSize = 20, forceRefresh = false): Observable<Article[]> {
     const cacheKey = `${country}-${category}-${page}-${pageSize}`;
     const cached = this.cache.get(cacheKey);
 
-    if (cached && (Date.now() - cached.timestamp < this.CACHE_DURATION)) {
+    if (!forceRefresh && cached && (Date.now() - cached.timestamp < this.CACHE_DURATION)) {
       console.log('Returning cached news for:', cacheKey);
       return of(cached.data);
     }
 
-    return this.http.get<any>(`${this.apiUrl}?country=${country}&category=${category}&apiKey=${this.apiKey}&page=${page}&pageSize=${pageSize}`).pipe(
-      map(response => {
-        if (response.status === 'error') {
-          throw new Error(response.message || 'API Error');
+    const options = {
+      url: `${this.apiUrl}`,
+      headers: {
+        'X-Api-Key': this.apiKey,
+        'Content-Type': 'application/json'
+        // 'User-Agent': 'NewsApp/1.0.0' // CapacitorHttp might handle this, but explicit header helps
+      },
+      params: {
+        country,
+        category,
+        // apiKey: this.apiKey, // Removed from params, using header
+        page: page.toString(),
+        pageSize: pageSize.toString()
+      }
+    };
+
+    // Use CapacitorHttp to bypass CORS and browser restrictions
+    return from(CapacitorHttp.get(options)).pipe(
+      map((response: HttpResponse) => {
+        if (response.status !== 200) {
+          // Log the full error data to help debugging
+          console.error('API Error Data:', response.data);
+          throw new Error(response.data.message || `API Error: ${response.status}`);
         }
-        return response.articles || [];
+        return response.data.articles || [];
       }),
       tap(articles => {
-        this.cache.set(cacheKey, { data: articles, timestamp: Date.now() });
+        // Only cache if we got results
+        if (articles.length > 0) {
+          this.cache.set(cacheKey, { data: articles, timestamp: Date.now() });
+        }
       })
     );
   }
 
   searchNews(query: string): Observable<Article[]> {
     const searchUrl = 'https://newsapi.org/v2/everything';
-    return this.http.get<any>(`${searchUrl}?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=20&apiKey=${this.apiKey}`).pipe(
-      map(response => response.articles)
+
+    const options = {
+      url: searchUrl,
+      headers: {
+        'X-Api-Key': this.apiKey,
+        'Content-Type': 'application/json'
+      },
+      params: {
+        q: query,
+        sortBy: 'publishedAt',
+        pageSize: '20'
+        // apiKey: this.apiKey
+      }
+    };
+
+    return from(CapacitorHttp.get(options)).pipe(
+      map((response: HttpResponse) => {
+        if (response.status !== 200) {
+          console.error('API Error Data:', response.data);
+          throw new Error(response.data.message || `API Error: ${response.status}`);
+        }
+        return response.data.articles || [];
+      })
     );
   }
 
