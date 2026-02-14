@@ -56,8 +56,8 @@ LE News is a professional, high-performance news application built with **Ionic 
 ## 📱 Android Download
 
 Para descargar la aplicación en tu teléfono:
-1. Ve a la carpeta `android-build` de este repositorio (si está disponible).
-2. Descarga el archivo `app-debug.apk`.
+1. Ve a la raiz de este repositorio.
+2. Descarga el archivo `new-app-debug.apk`.
 3. Abre el archivo en tu dispositivo Android y sigue las instrucciones de instalación.
 
 ---
