@@ -68,8 +68,8 @@
 
     <!-- Grid for remaining items -->
     <div class="news-grid">
-      @for (article of articles.slice(1); track article.url) {
-      <ion-card (click)="openDetail(article)" class="news-card">
+      @for (article of articles.slice(1); track article.url; let i = $index) {
+      <ion-card (click)="openDetail(article)" class="news-card" [style.--animation-order]="i">
         @if (article.urlToImage) {
         <div class="card-image-wrapper">
           <img [src]="article.urlToImage" loading="lazy" />
@@ -116,10 +116,7 @@
     </div>
     }
 
-    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
-      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more news...">
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
+
 
   </div>
 </ion-content>
