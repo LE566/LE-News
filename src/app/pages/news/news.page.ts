@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonIcon, IonRefresher, IonRefresherContent, IonCard, IonCardHeader,
-  IonCardTitle, IonSkeletonText, ModalController, IonInfiniteScroll, IonInfiniteScrollContent, ToastController
+  IonCardTitle, IonSkeletonText, ModalController, ToastController
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { NewsService, Article } from '../../core/services/news.service';
@@ -19,7 +19,7 @@ import { NotificationsModal } from '../notifications/notifications.modal';
     DatePipe,
     IonContent, IonHeader, IonToolbar, IonButtons, IonButton,
     IonIcon, IonRefresher, IonRefresherContent, IonCard, IonCardHeader,
-    IonCardTitle, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent
+    IonCardTitle, IonSkeletonText
   ]
 })
 export class NewsPage implements OnInit {
@@ -46,36 +46,21 @@ export class NewsPage implements OnInit {
     return localStorage.getItem('le_news_region') || 'us';
   }
 
-  async loadNews(event?: any, isInfinite: boolean = false) {
+  async loadNews(event?: any) {
     if (!event) {
       this.loading = true;
     }
 
     const region = this.getRegionCode();
 
-    // Reset page on refresh or category change (not infinite scroll)
-    if (!isInfinite) {
-      this.page = 1;
-    }
+    // Always reset page on load since we removed pagination
+    this.page = 1;
 
-    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase(), this.page).subscribe({
+    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase(), this.page, 20, !!event).subscribe({
       next: (data) => {
-        // Allow articles without images, handled in template
-        const newArticles = data;
-
-        if (this.page === 1) {
-          this.articles = newArticles;
-        } else {
-          this.articles.push(...newArticles);
-        }
-
+        this.articles = data;
         this.loading = false;
         if (event) event.target.complete();
-
-        // Disable infinite scroll if no more data
-        if (isInfinite && newArticles.length === 0 && event) {
-          event.target.disabled = true;
-        }
       },
       error: async (err) => {
         console.error(err);
@@ -83,8 +68,8 @@ export class NewsPage implements OnInit {
         if (event) event.target.complete();
 
         const toast = await this.toastCtrl.create({
-          message: 'Could not load news. Check your connection',
-          duration: 3000,
+          message: `Error loading news: ${err.message || 'Check connection'}`,
+          duration: 4000,
           color: 'danger',
           position: 'bottom',
           icon: 'alert-circle-outline'
@@ -92,11 +77,6 @@ export class NewsPage implements OnInit {
         await toast.present();
       }
     });
-  }
-
-  loadMore(event: any) {
-    this.page++;
-    this.loadNews(event, true);
   }
 
   selectCategory(category: string) {
