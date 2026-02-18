@@ -51,13 +51,14 @@ import {
         transition: all 0.3s ease;
 
         ion-icon {
-          font-size: 22px;
+          font-size: 20px;
           margin-bottom: 2px;
         }
 
         &.tab-selected {
           ion-icon {
             transform: scale(1.1);
+            color: var(--ion-color-primary);
           }
         }
       }

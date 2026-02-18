@@ -28,32 +28,29 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-// Scrollbar styling
-::-webkit-scrollbar {
-  width: 4px;
+// Header
+.main-header {
+  --background: rgba(255, 255, 255, 0.95);
+  --border-style: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  --padding-start: 16px;
+  --padding-end: 8px;
+
+  @media (prefers-color-scheme: dark) {
+    --background: rgba(15, 23, 42, 0.95);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+:host-context(.dark) .main-header {
+  --background: rgba(15, 23, 42, 0.95);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+:host-context(.light) .main-header {
+  --background: rgba(255, 255, 255, 0.95);
 }
 
-// Image defaults
-img {
-  -webkit-user-drag: none;
-  user-select: none;
-}
-
-// Global ion-card
-ion-card {
-  --border-radius: 20px;
-}
-
-// H1 defaults
+// Global defaults using dynamic sizes
 h1,
 h2,
 h3,
@@ -61,6 +58,14 @@ h4,
 h5,
 h6 {
   font-family: 'Inter', sans-serif;
+  font-size: var(--le-title-size);
+}
+
+p,
+span,
+div,
+ion-label {
+  font-size: var(--le-body-size);
 }
 
 // Toolbar
@@ -71,7 +76,7 @@ ion-toolbar {
   ion-title {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: calc(var(--le-title-size) * 1.05);
     letter-spacing: -0.3px;
   }
 }
@@ -85,6 +90,7 @@ ion-toast {
 
   &::part(message) {
     font-weight: 600;
+    font-size: var(--le-body-size);
   }
 }
 
@@ -94,6 +100,7 @@ ion-button {
   font-family: 'Inter', sans-serif;
   text-transform: none;
   letter-spacing: 0;
+  font-size: var(--le-body-size);
 }
 
 // ===== Premium Alert =====
@@ -116,7 +123,7 @@ ion-alert {
     .alert-title {
       color: white !important;
       font-family: 'Inter', sans-serif !important;
-      font-size: 1.15rem !important;
+      font-size: calc(var(--le-title-size) * 1.1) !important;
       font-weight: 800 !important;
       letter-spacing: -0.3px;
     }
@@ -124,7 +131,7 @@ ion-alert {
     .alert-sub-title {
       color: rgba(255, 255, 255, 0.85) !important;
       font-family: 'Inter', sans-serif !important;
-      font-size: 0.85rem !important;
+      font-size: var(--le-small-size) !important;
       font-weight: 500 !important;
       margin-top: 4px;
     }
@@ -133,7 +140,7 @@ ion-alert {
   .alert-message {
     padding: 20px 24px 10px !important;
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.9rem !important;
+    font-size: var(--le-body-size) !important;
     line-height: 1.5 !important;
     color: var(--ion-text-color) !important;
     text-align: center;
@@ -150,7 +157,7 @@ ion-alert {
 
       input {
         font-family: 'Inter', sans-serif !important;
-        font-size: 0.95rem !important;
+        font-size: var(--le-body-size) !important;
         padding: 14px 16px !important;
 
         &:focus {
@@ -168,8 +175,8 @@ ion-alert {
     .alert-button {
       border-radius: 14px !important;
       font-family: 'Inter', sans-serif !important;
-      font-weight: 700 !important;
-      font-size: 0.92rem !important;
+      font-weight: 700;
+      font-size: var(--le-body-size) !important;
       text-transform: none !important;
       min-height: 48px;
       margin: 0 !important;
@@ -247,7 +254,7 @@ ion-action-sheet {
     .action-sheet-title {
       font-family: 'Inter', sans-serif;
       font-weight: 800;
-      font-size: 1rem;
+      font-size: var(--le-title-size);
       color: var(--ion-text-color);
       padding: 20px 16px 12px;
     }
@@ -255,7 +262,7 @@ ion-action-sheet {
     .action-sheet-button {
       font-family: 'Inter', sans-serif;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: var(--le-body-size);
       height: 56px;
 
       &.action-sheet-destructive {
@@ -290,7 +297,7 @@ ion-loading {
     .loading-content {
       font-family: 'Inter', sans-serif !important;
       font-weight: 600 !important;
-      font-size: 0.9rem !important;
+      font-size: var(--le-body-size) !important;
     }
   }
 }

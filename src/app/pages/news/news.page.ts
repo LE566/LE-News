@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { addIcons } from 'ionicons';
+import { alertCircleOutline } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
@@ -23,6 +25,11 @@ import { NotificationsModal } from '../notifications/notifications.modal';
   ]
 })
 export class NewsPage implements OnInit {
+  private newsService = inject(NewsService);
+  private router = inject(Router);
+  private modalCtrl = inject(ModalController);
+  private toastCtrl = inject(ToastController);
+
   articles: Article[] = [];
   loading = true;
   today = new Date();
@@ -31,12 +38,9 @@ export class NewsPage implements OnInit {
   categories = ['General', 'Business', 'Technology', 'Entertainment', 'Health', 'Science', 'Sports'];
   selectedCategory = 'General';
 
-  constructor(
-    private newsService: NewsService,
-    private router: Router,
-    private modalCtrl: ModalController,
-    private toastCtrl: ToastController
-  ) { }
+  constructor() {
+    addIcons({ alertCircleOutline });
+  }
 
   ngOnInit() {
     this.loadNews();

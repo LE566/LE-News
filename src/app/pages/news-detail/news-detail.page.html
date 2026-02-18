@@ -15,34 +15,35 @@
   </ion-toolbar>
 </ion-header>
 
-@if (article) {
+@if (article()) {
 <ion-content [fullscreen]="true" class="detail-content">
   <div class="article-container">
-    @if (article.urlToImage) {
+    @if (article()!.urlToImage) {
     <div class="header-image-wrapper">
-      <img [src]="article.urlToImage" alt="Article Image" />
+      <img [src]="article()!.urlToImage" alt="Article Image" />
     </div>
     }
 
     <div class="article-content ion-padding">
       <div class="article-meta">
-        <span class="source-badge">{{ article.source.name }}</span>
+        <span class="source-badge">{{ article()!.source.name }}</span>
         <span class="date">
           <ion-icon name="calendar-outline"></ion-icon>
-          {{ article.publishedAt | date:'mediumDate' }}
+          {{ article()!.publishedAt | date:'mediumDate' }}
         </span>
       </div>
 
-      <h1>{{ article.title }}</h1>
+      <h1>{{ article()!.title }}</h1>
 
-      @if (article.author) {
+      @if (article()!.author) {
       <div class="author-row">
         <ion-avatar>
-          <img src="https://ui-avatars.com/api/?name={{ article.author }}&background=6366F1&color=fff" alt="Author" />
+          <img src="https://ui-avatars.com/api/?name={{ article()!.author }}&background=6366F1&color=fff"
+            alt="Author" />
         </ion-avatar>
         <div class="author-info">
           <span class="by">Written by</span>
-          <span class="name">{{ article.author }}</span>
+          <span class="name">{{ article()!.author }}</span>
         </div>
         <span class="read-time">
           <ion-icon name="time-outline"></ion-icon>
@@ -54,13 +55,13 @@
       <div class="divider"></div>
 
       <div class="article-body">
-        @if (article.description) {
-        <p class="lead">{{ article.description }}</p>
+        @if (article()!.description) {
+        <p class="lead">{{ article()!.description }}</p>
         }
-        <p class="content-text">{{ article.content || 'Read the full story to see more details.' }}</p>
+        <p class="content-text">{{ article()!.content || 'Read the full story to see more details.' }}</p>
       </div>
 
-      <ion-button expand="block" shape="round" class="read-more-btn" (click)="openOriginal(article.url)">
+      <ion-button expand="block" shape="round" class="read-more-btn" (click)="openOriginal(article()!.url)">
         Read Full Story
         <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
       </ion-button>

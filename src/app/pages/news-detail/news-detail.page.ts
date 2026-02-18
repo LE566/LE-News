@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { addIcons } from 'ionicons';
+import { shareOutline, bookmarkOutline, closeOutline, globeOutline, chevronBackOutline } from 'ionicons/icons';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonIcon, IonBackButton, IonAvatar, ToastController
@@ -21,30 +23,31 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
   ]
 })
 export class NewsDetailPage implements OnInit {
-  article: Article | null = null;
+  private newsService = inject(NewsService);
+  private bookmarksService = inject(BookmarksService);
+  private toastCtrl = inject(ToastController);
+  private router = inject(Router);
+
+  article = this.newsService.getCurrentArticle();
   isBookmarked = false;
 
-  constructor(
-    private newsService: NewsService,
-    private bookmarksService: BookmarksService,
-    private toastCtrl: ToastController,
-    private router: Router
-  ) { }
+  constructor() {
+    addIcons({ shareOutline, bookmarkOutline, closeOutline, globeOutline, chevronBackOutline });
+  }
 
   ngOnInit() {
-    this.newsService.getCurrentArticle().subscribe(article => {
-      if (!article) {
-        this.router.navigate(['/tabs/news']);
-      } else {
-        this.article = article;
-        this.isBookmarked = this.bookmarksService.isBookmarked(article.url);
-      }
-    });
+    const article = this.article();
+    if (!article) {
+      this.router.navigate(['/tabs/news']);
+    } else {
+      this.isBookmarked = this.bookmarksService.isBookmarked(article.url);
+    }
   }
 
   async toggleBookmark() {
-    if (this.article) {
-      const added = this.bookmarksService.toggle(this.article);
+    const article = this.article();
+    if (article) {
+      const added = this.bookmarksService.toggle(article);
       this.isBookmarked = added;
 
       const toast = await this.toastCtrl.create({
@@ -58,11 +61,12 @@ export class NewsDetailPage implements OnInit {
   }
 
   async shareArticle() {
-    if (this.article) {
+    const article = this.article();
+    if (article) {
       await Share.share({
-        title: this.article.title,
+        title: article.title,
         text: 'Check out this news!',
-        url: this.article.url,
+        url: article.url,
         dialogTitle: 'Share with buddies',
       });
     }

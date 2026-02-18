@@ -70,7 +70,7 @@ ion-content {
         color: white;
         padding: 6px 14px;
         border-radius: 8px;
-        font-size: 0.72rem;
+        font-size: var(--le-small-size);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -81,7 +81,7 @@ ion-content {
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 0.85rem;
+        font-size: var(--le-small-size);
         color: var(--ion-color-medium);
         font-weight: 500;
 
@@ -92,7 +92,7 @@ ion-content {
 }
 
 h1 {
-    font-size: 1.8rem;
+    font-size: calc(var(--le-title-size) * 1.5);
     font-weight: 800;
     line-height: 1.25;
     margin-bottom: 24px;
@@ -123,7 +123,7 @@ h1 {
         flex: 1;
 
         .by {
-            font-size: 0.7rem;
+            font-size: var(--le-small-size);
             color: var(--ion-color-medium);
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -132,7 +132,7 @@ h1 {
 
         .name {
             font-weight: 700;
-            font-size: 0.92rem;
+            font-size: var(--le-body-size);
             color: var(--ion-text-color);
         }
     }
@@ -141,7 +141,7 @@ h1 {
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 0.78rem;
+        font-size: var(--le-small-size);
         color: var(--ion-color-medium);
         font-weight: 500;
         white-space: nowrap;
@@ -162,7 +162,7 @@ h1 {
     margin-bottom: 36px;
 
     .lead {
-        font-size: 1.12rem;
+        font-size: calc(var(--le-body-size) * 1.1);
         font-weight: 600;
         line-height: 1.7;
         margin-bottom: 20px;
@@ -172,7 +172,7 @@ h1 {
     }
 
     .content-text {
-        font-size: 1.02rem;
+        font-size: var(--le-body-size);
         line-height: 1.85;
         color: var(--ion-color-step-600, #555);
     }
@@ -182,7 +182,7 @@ h1 {
     --box-shadow: 0 8px 24px rgba(var(--ion-color-primary-rgb), 0.3);
     font-weight: 700;
     height: 54px;
-    font-size: 1.02rem;
+    font-size: var(--le-body-size);
     --border-radius: 16px;
     --background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
     letter-spacing: 0.3px;
@@ -197,7 +197,7 @@ h1 {
     margin-top: 24px;
 
     p {
-        font-size: 0.78rem;
+        font-size: var(--le-small-size);
         color: var(--ion-color-medium);
         opacity: 0.5;
 

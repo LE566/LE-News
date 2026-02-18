@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; // Keep for now if used elsewhere, but we are replacing usage
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -24,7 +24,8 @@ export class NewsService {
   private apiUrl = 'https://newsapi.org/v2/top-headlines';
 
   private articles: Article[] = [];
-  private currentArticleSubject = new BehaviorSubject<Article | null>(null);
+  // Signal state
+  private currentArticleSignal = signal<Article | null>(null);
 
   private cache = new Map<string, { data: Article[], timestamp: number }>();
   private CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
@@ -68,10 +69,10 @@ export class NewsService {
   }
 
   setCurrentArticle(article: Article) {
-    this.currentArticleSubject.next(article);
+    this.currentArticleSignal.set(article);
   }
 
-  getCurrentArticle(): Observable<Article | null> {
-    return this.currentArticleSubject.asObservable();
+  getCurrentArticle() {
+    return this.currentArticleSignal.asReadonly();
   }
 }

@@ -93,6 +93,11 @@ export class AuthService {
 
   async enableBiometricAuth(email: string, password: string): Promise<boolean> {
     try {
+      const user = this.db.findUserByEmail(email);
+      if (!user || user.password !== password) {
+        return false;
+      }
+
       const isAvailable = await this.canUseBiometrics();
       if (!isAvailable) return false;
 

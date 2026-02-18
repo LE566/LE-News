@@ -1,4 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
+import { addIcons } from 'ionicons';
+import {
+  camera, closeOutline, createOutline, shieldCheckmarkOutline,
+  personOutline, mailOutline, fingerPrintOutline, notificationsOutline,
+  settingsOutline, chevronForwardOutline, codeSlashOutline, logOutOutline
+} from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
@@ -22,17 +31,23 @@ import { CustomAlertService } from '../../shared/custom-alert.service';
   ]
 })
 export class ProfilePage implements OnInit {
+  private authService = inject(AuthService);
+  private toastCtrl = inject(ToastController);
+  private alertService = inject(CustomAlertService);
+  private router = inject(Router);
+
   user: User | null = null;
   biometricsEnabled = false;
   notificationsEnabled = false;
   isEditing = false;
 
-  constructor(
-    private authService: AuthService,
-    private toastCtrl: ToastController,
-    private alertService: CustomAlertService,
-    private router: Router
-  ) { }
+  constructor() {
+    addIcons({
+      camera, closeOutline, createOutline, shieldCheckmarkOutline,
+      personOutline, mailOutline, fingerPrintOutline, notificationsOutline,
+      settingsOutline, chevronForwardOutline, codeSlashOutline, logOutOutline
+    });
+  }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
@@ -41,6 +56,17 @@ export class ProfilePage implements OnInit {
         this.biometricsEnabled = user.hasBiometricsEnabled;
       }
     });
+
+    if (Capacitor.isNativePlatform()) {
+      this.checkPermissions();
+    }
+  }
+
+  async checkPermissions() {
+    const permStatus = await PushNotifications.checkPermissions();
+    if (permStatus.receive === 'granted') {
+      this.notificationsEnabled = true;
+    }
   }
 
   toggleEdit() {
@@ -49,6 +75,47 @@ export class ProfilePage implements OnInit {
     } else {
       this.isEditing = true;
     }
+  }
+
+  async toggleNotifications() {
+    if (this.notificationsEnabled) {
+      // User is turning ON notifications
+      if (Capacitor.getPlatform() !== 'web') {
+        const permStatus = await PushNotifications.requestPermissions();
+        if (permStatus.receive === 'granted') {
+          await PushNotifications.register();
+          this.addListeners();
+          this.showToast('Push notifications enabled');
+        } else {
+          this.notificationsEnabled = false;
+          this.showToast('Permission denied for notifications');
+        }
+      } else {
+        this.showToast('Push notifications not supported on web');
+        this.notificationsEnabled = false;
+      }
+    } else {
+      // User is turning OFF notifications
+      // In a real app we would unsubscribe from topic or update backend
+      if (Capacitor.getPlatform() !== 'web') {
+        await PushNotifications.removeAllListeners();
+      }
+      this.showToast('Push notifications disabled');
+    }
+  }
+
+  addListeners() {
+    PushNotifications.addListener('registration', token => {
+      console.log('Push registration success, token: ' + token.value);
+    });
+
+    PushNotifications.addListener('registrationError', (error: any) => {
+      console.error('Error on registration: ' + JSON.stringify(error));
+    });
+
+    PushNotifications.addListener('pushNotificationReceived', (notification: any) => {
+      this.showToast(`Notification received: ${notification.title}`);
+    });
   }
 
   async toggleBiometrics() {
@@ -73,7 +140,7 @@ export class ProfilePage implements OnInit {
             this.showToast('Biometrics enabled successfully');
           } else {
             this.biometricsEnabled = false;
-            this.showToast('Failed to enable biometrics');
+            this.showToast('Incorrect password or biometrics failed');
           }
         } else {
           this.biometricsEnabled = false;
@@ -87,18 +154,24 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file && this.user) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (this.user) {
-          this.user.avatarUrl = reader.result as string;
-          this.authService.updateUser(this.user);
-          this.showToast('Profile picture updated.');
-        }
-      };
-      reader.readAsDataURL(file);
+  async changeProfilePicture() {
+    if (!this.isEditing) return;
+
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt // Ask: Camera or Photos
+      });
+
+      if (image && image.dataUrl && this.user) {
+        this.user.avatarUrl = image.dataUrl;
+        this.authService.updateUser(this.user);
+        this.showToast('Profile picture updated.');
+      }
+    } catch (error) {
+      console.log('Camera/Gallery cancelled or failed', error);
     }
   }
 

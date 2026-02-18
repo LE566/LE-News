@@ -64,7 +64,7 @@ ion-content {
 
     .header-title {
         font-family: 'Inter', sans-serif;
-        font-size: 1.25rem;
+        font-size: calc(var(--le-title-size) * 1.1);
         font-weight: 800;
         letter-spacing: -0.5px;
         color: var(--ion-text-color);
@@ -74,7 +74,7 @@ ion-content {
 .notification-btn {
     position: relative;
     --color: var(--ion-color-dark);
-    font-size: 1.2rem;
+    font-size: calc(var(--le-title-size) * 1.1);
 
     .notification-dot {
         position: absolute;
@@ -90,7 +90,7 @@ ion-content {
 
 .profile-btn {
     --color: var(--ion-color-dark);
-    font-size: 1.3rem;
+    font-size: calc(var(--le-title-size) * 1.2);
 }
 
 // Section Header
@@ -102,12 +102,12 @@ ion-content {
         color: var(--ion-color-primary);
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.78rem;
+        font-size: var(--le-small-size);
         letter-spacing: 1.5px;
     }
 
     h2 {
-        font-size: 2rem;
+        font-size: calc(var(--le-title-size) * 1.6);
         font-weight: 800;
         margin: 0;
         letter-spacing: -1px;
@@ -163,7 +163,7 @@ ion-content {
         background: var(--ion-color-primary);
         padding: 5px 12px;
         border-radius: 20px;
-        font-size: 0.7rem;
+        font-size: var(--le-small-size);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -172,7 +172,7 @@ ion-content {
 
     h3 {
         margin: 12px 0 8px;
-        font-size: 1.45rem;
+        font-size: calc(var(--le-title-size) * 1.25);
         font-weight: 700;
         line-height: 1.25;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -184,7 +184,7 @@ ion-content {
     }
 
     .featured-meta {
-        font-size: 0.85rem;
+        font-size: var(--le-small-size);
         opacity: 0.75;
 
         .dot {
@@ -207,7 +207,7 @@ ion-content {
 
     span {
         font-family: 'Inter', sans-serif;
-        font-size: 0.95rem;
+        font-size: var(--le-body-size);
         font-weight: 700;
         color: var(--ion-text-color);
         letter-spacing: -0.3px;
@@ -232,16 +232,18 @@ ion-content {
 .news-card {
     margin: 0;
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Deeper shadow */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    /* Deeper shadow */
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     background: var(--ion-background-color, #fff);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     height: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Subtle border */
     overflow: hidden;
-    
+
     /* Animation */
     opacity: 0;
     animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -253,7 +255,8 @@ ion-content {
     }
 
     .card-image-wrapper {
-        height: 180px; /* Slightly taller */
+        height: 180px;
+        /* Slightly taller */
         overflow: hidden;
         position: relative;
 
@@ -263,7 +266,7 @@ ion-content {
             object-fit: cover;
             transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
         }
-        
+
         &::after {
             content: '';
             position: absolute;
@@ -271,7 +274,7 @@ ion-content {
             left: 0;
             width: 100%;
             height: 30%;
-            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
             opacity: 0.6;
         }
     }
@@ -294,7 +297,7 @@ ion-content {
         margin-bottom: 12px;
 
         .source-tag {
-            font-size: 0.7rem;
+            font-size: var(--le-small-size);
             font-weight: 700;
             color: var(--ion-color-primary);
             text-transform: uppercase;
@@ -305,15 +308,16 @@ ion-content {
         }
 
         .time-tag {
-            font-size: 0.75rem;
+            font-size: var(--le-small-size);
             color: var(--ion-color-medium);
             font-weight: 500;
         }
     }
 
     ion-card-title {
-        font-family: 'Inter', sans-serif; /* Ensure attractive font */
-        font-size: 1.05rem;
+        font-family: 'Inter', sans-serif;
+        /* Ensure attractive font */
+        font-size: var(--le-card-title-size);
         font-weight: 700;
         line-height: 1.45;
         color: var(--ion-text-color);
@@ -331,6 +335,7 @@ ion-content {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -361,14 +366,14 @@ ion-content {
     }
 
     h3 {
-        font-size: 1.15rem;
+        font-size: var(--le-title-size);
         font-weight: 700;
         margin: 0 0 8px;
         color: var(--ion-text-color);
     }
 
     p {
-        font-size: 0.9rem;
+        font-size: var(--le-body-size);
         margin: 0 0 20px;
     }
 }
@@ -399,7 +404,7 @@ ion-content {
         background: var(--ion-color-step-50, #f0f0f0);
         color: var(--ion-color-medium);
         border-radius: 24px;
-        font-size: 0.82rem;
+        font-size: var(--le-small-size);
         font-weight: 600;
         white-space: nowrap;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);

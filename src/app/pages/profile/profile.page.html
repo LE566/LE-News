@@ -17,14 +17,13 @@
   <div class="background-blob"></div>
 
   <div class="profile-header ion-text-center">
-    <div class="avatar-wrapper" (click)="isEditing && fileInput.click()" [class.editable]="isEditing">
+    <div class="avatar-wrapper" (click)="changeProfilePicture()" [class.editable]="isEditing">
       <img [src]="user?.avatarUrl || 'https://ionicframework.com/docs/img/demos/avatar.svg'" alt="Avatar" />
       @if (isEditing) {
       <div class="edit-avatar-badge">
         <ion-icon name="camera"></ion-icon>
       </div>
       }
-      <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
     </div>
     @if (user) {
     <h2>{{ user.name }}</h2>
@@ -75,7 +74,7 @@
           <h2>Push Notifications</h2>
           <p>Breaking news alerts</p>
         </ion-label>
-        <ion-toggle [(ngModel)]="notificationsEnabled" slot="end"></ion-toggle>
+        <ion-toggle [(ngModel)]="notificationsEnabled" (ionChange)="toggleNotifications()" slot="end"></ion-toggle>
       </ion-item>
     </div>
 
