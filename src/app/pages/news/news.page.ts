@@ -12,6 +12,9 @@ import { NewsService, Article } from '../../core/services/news.service';
 import { DatePipe } from '@angular/common';
 import { NotificationsModal } from '../notifications/notifications.modal';
 
+// Importamos Capacitor Haptics
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
 @Component({
   selector: 'app-news',
   templateUrl: './news.page.html',
@@ -53,6 +56,9 @@ export class NewsPage implements OnInit {
   async loadNews(event?: any) {
     if (!event) {
       this.loading = true;
+    } else {
+      // ✨ Haptic ligero cuando el usuario hace pull-to-refresh
+      await Haptics.impact({ style: ImpactStyle.Light });
     }
 
     const region = this.getRegionCode();
@@ -83,14 +89,22 @@ export class NewsPage implements OnInit {
     });
   }
 
-  selectCategory(category: string) {
+  // Convertimos a async para usar await con Haptics
+  async selectCategory(category: string) {
+    // Haptic ligero al tocar un chip de categoría
+    await Haptics.impact({ style: ImpactStyle.Light });
+
     this.selectedCategory = category;
     this.loading = true;
     this.articles = [];
     this.loadNews();
   }
 
-  openDetail(article: Article) {
+  // Convertimos a async para usar await con Haptics
+  async openDetail(article: Article) {
+    // Haptic medio al entrar a leer un artículo
+    await Haptics.impact({ style: ImpactStyle.Medium });
+
     this.newsService.setCurrentArticle(article);
     this.router.navigate(['/news-detail']);
   }
