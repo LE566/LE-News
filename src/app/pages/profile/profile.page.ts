@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/user.model';
 import { CustomAlertService } from '../../shared/custom-alert.service';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-profile',
@@ -69,17 +70,15 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  toggleEdit() {
-    if (this.isEditing) {
-      this.isEditing = false;
-    } else {
-      this.isEditing = true;
-    }
+  async toggleEdit() {
+    await Haptics.impact({ style: ImpactStyle.Light });
+    this.isEditing = !this.isEditing;
   }
 
   async toggleNotifications() {
+    await Haptics.impact({ style: ImpactStyle.Light });
+    
     if (this.notificationsEnabled) {
-      // User is turning ON notifications
       if (Capacitor.getPlatform() !== 'web') {
         const permStatus = await PushNotifications.requestPermissions();
         if (permStatus.receive === 'granted') {
@@ -95,8 +94,6 @@ export class ProfilePage implements OnInit {
         this.notificationsEnabled = false;
       }
     } else {
-      // User is turning OFF notifications
-      // In a real app we would unsubscribe from topic or update backend
       if (Capacitor.getPlatform() !== 'web') {
         await PushNotifications.removeAllListeners();
       }
@@ -115,10 +112,13 @@ export class ProfilePage implements OnInit {
 
     PushNotifications.addListener('pushNotificationReceived', (notification: any) => {
       this.showToast(`Notification received: ${notification.title}`);
+      Haptics.notification({ type: NotificationType.Success });
     });
   }
 
   async toggleBiometrics() {
+    await Haptics.impact({ style: ImpactStyle.Medium });
+    
     if (this.user) {
       if (this.biometricsEnabled) {
         const data = await this.alertService.input({
@@ -137,9 +137,11 @@ export class ProfilePage implements OnInit {
           if (success) {
             this.user.hasBiometricsEnabled = true;
             this.authService.updateBiometrics(true);
+            await Haptics.notification({ type: NotificationType.Success });
             this.showToast('Biometrics enabled successfully');
           } else {
             this.biometricsEnabled = false;
+            await Haptics.notification({ type: NotificationType.Error });
             this.showToast('Incorrect password or biometrics failed');
           }
         } else {
@@ -149,6 +151,7 @@ export class ProfilePage implements OnInit {
       } else {
         this.user.hasBiometricsEnabled = false;
         this.authService.updateBiometrics(false);
+        await Haptics.impact({ style: ImpactStyle.Light });
         this.showToast('Biometrics disabled');
       }
     }
@@ -157,17 +160,20 @@ export class ProfilePage implements OnInit {
   async changeProfilePicture() {
     if (!this.isEditing) return;
 
+    await Haptics.impact({ style: ImpactStyle.Medium });
+
     try {
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
         resultType: CameraResultType.DataUrl,
-        source: CameraSource.Prompt // Ask: Camera or Photos
+        source: CameraSource.Prompt 
       });
 
       if (image && image.dataUrl && this.user) {
         this.user.avatarUrl = image.dataUrl;
         this.authService.updateUser(this.user);
+        await Haptics.notification({ type: NotificationType.Success });
         this.showToast('Profile picture updated.');
       }
     } catch (error) {
@@ -175,15 +181,18 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  saveChanges() {
+  async saveChanges() {
     if (this.user) {
       this.authService.updateUser(this.user);
       this.isEditing = false;
+      await Haptics.notification({ type: NotificationType.Success });
       this.showToast('Profile updated successfully');
     }
   }
 
   async logout() {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
+    
     const confirmed = await this.alertService.confirm({
       icon: 'log-out-outline',
       title: 'Sign Out',
@@ -198,15 +207,18 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  openSettings() {
+  async openSettings() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     this.router.navigate(['/settings']);
   }
 
-  openPrivacyPolicy() {
+  async openPrivacyPolicy() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     this.router.navigate(['/privacy-policy']);
   }
 
-  openLicenses() {
+  async openLicenses() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     this.router.navigate(['/licenses']);
   }
 

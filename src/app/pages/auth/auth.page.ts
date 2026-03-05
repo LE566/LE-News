@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { DatabaseService } from '../../core/services/database.service';
 import { User } from '../../core/models/user.model';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-auth',
@@ -61,28 +62,35 @@ export class AuthPage implements OnInit {
   }
 
   async loginWithUser(user: any) {
+    await Haptics.impact({ style: ImpactStyle.Medium });
     this.isBiometricLoading = true;
+    
     try {
       const success = await this.authService.loginWithBiometrics(user.email);
       this.isBiometricLoading = false;
 
       if (success) {
+        await Haptics.notification({ type: NotificationType.Success });
         await this.showToast(`Welcome back, ${user.name}`);
         this.router.navigate(['/news']);
       } else {
+        await Haptics.notification({ type: NotificationType.Error });
         await this.showToast('Authentication failed');
       }
     } catch (e) {
       this.isBiometricLoading = false;
+      await Haptics.notification({ type: NotificationType.Error });
       await this.showToast('Error logging in');
     }
   }
 
-  toggleMode() {
+  async toggleMode() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     this.isLogin = !this.isLogin;
   }
 
   async onSubmit() {
+    await Haptics.impact({ style: ImpactStyle.Medium });
     if (this.isLogin) {
       this.login();
     } else {
@@ -93,9 +101,11 @@ export class AuthPage implements OnInit {
   async login() {
     this.authService.login(this.userData.email, this.userData.password).subscribe(async (success) => {
       if (success) {
+        await Haptics.notification({ type: NotificationType.Success });
         await this.showToast('Login successful!');
         this.router.navigate(['/news']);
       } else {
+        await Haptics.notification({ type: NotificationType.Error });
         await this.showToast('Invalid credentials or user not found.');
       }
     });
@@ -112,9 +122,11 @@ export class AuthPage implements OnInit {
 
     this.authService.register(newUser).subscribe(async (success) => {
       if (success) {
+        await Haptics.notification({ type: NotificationType.Success });
         await this.showToast('Registration successful! Biometrics can be enabled in profile.');
         this.router.navigate(['/news']);
       } else {
+        await Haptics.notification({ type: NotificationType.Error });
         await this.showToast('User already exists.');
       }
     });

@@ -2,28 +2,29 @@ import { Component } from '@angular/core';
 import {
   IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel
 } from '@ionic/angular/standalone';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-tabs',
   template: `
     <ion-tabs>
       <ion-tab-bar slot="bottom" class="premium-tab-bar">
-        <ion-tab-button tab="news">
+        <ion-tab-button tab="news" (click)="triggerHaptic()">
           <ion-icon name="newspaper"></ion-icon>
           <ion-label>Feed</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="search">
+        <ion-tab-button tab="search" (click)="triggerHaptic()">
           <ion-icon name="search-outline"></ion-icon>
           <ion-label>Search</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="bookmarks">
+        <ion-tab-button tab="bookmarks" (click)="triggerHaptic()">
           <ion-icon name="bookmark-outline"></ion-icon>
           <ion-label>Saved</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="profile">
+        <ion-tab-button tab="profile" (click)="triggerHaptic()">
           <ion-icon name="person-outline"></ion-icon>
           <ion-label>Profile</ion-label>
         </ion-tab-button>
@@ -84,4 +85,8 @@ import {
   standalone: true,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel]
 })
-export class TabsPage { }
+export class TabsPage {
+  async triggerHaptic() {
+    await Haptics.impact({ style: ImpactStyle.Light });
+  }
+}

@@ -1,19 +1,18 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline } from 'ionicons/icons';
+import { alertCircleOutline, chevronDownCircleOutline, notificationsOutline, newspaperOutline } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonIcon, IonRefresher, IonRefresherContent, IonCard, IonCardHeader,
-  IonCardTitle, IonSkeletonText, ModalController, ToastController
+  IonCardTitle, IonSkeletonText, ModalController, ToastController,
+  IonInfiniteScroll, IonInfiniteScrollContent
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { NewsService, Article } from '../../core/services/news.service';
 import { DatePipe } from '@angular/common';
 import { NotificationsModal } from '../notifications/notifications.modal';
-
-// Importamos Capacitor Haptics
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-news',
@@ -24,10 +23,15 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
     DatePipe,
     IonContent, IonHeader, IonToolbar, IonButtons, IonButton,
     IonIcon, IonRefresher, IonRefresherContent, IonCard, IonCardHeader,
-    IonCardTitle, IonSkeletonText
+    IonCardTitle, IonSkeletonText,
+    IonInfiniteScroll, IonInfiniteScrollContent
   ]
 })
 export class NewsPage implements OnInit {
+  
+  @ViewChild(IonContent, { static: false }) content!: IonContent;
+  @ViewChild(IonInfiniteScroll) infiniteScroll!: IonInfiniteScroll;
+
   private newsService = inject(NewsService);
   private router = inject(Router);
   private modalCtrl = inject(ModalController);
@@ -35,18 +39,33 @@ export class NewsPage implements OnInit {
 
   articles: Article[] = [];
   loading = true;
+  loadingMore = false; 
   today = new Date();
   page = 1;
+  private currentRegion = 'us';
+  private pageSize = 5;
 
   categories = ['General', 'Business', 'Technology', 'Entertainment', 'Health', 'Science', 'Sports'];
   selectedCategory = 'General';
 
   constructor() {
-    addIcons({ alertCircleOutline });
+    addIcons({ alertCircleOutline, chevronDownCircleOutline, notificationsOutline, newspaperOutline });
   }
 
   ngOnInit() {
+    this.currentRegion = this.getRegionCode();
     this.loadNews();
+  }
+
+  ionViewWillEnter() {
+    const savedRegion = this.getRegionCode();
+    
+    if (this.currentRegion !== savedRegion) {
+      this.currentRegion = savedRegion;
+      this.loading = true;
+      this.articles = [];
+      this.loadNews();
+    }
   }
 
   getRegionCode(): string {
@@ -57,42 +76,100 @@ export class NewsPage implements OnInit {
     if (!event) {
       this.loading = true;
     } else {
-      // ✨ Haptic ligero cuando el usuario hace pull-to-refresh
       await Haptics.impact({ style: ImpactStyle.Light });
     }
 
     const region = this.getRegionCode();
-
-    // Always reset page on load since we removed pagination
     this.page = 1;
+    
+    if (this.infiniteScroll) {
+      this.infiniteScroll.disabled = false;
+    }
 
-    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase(), this.page, 20, !!event).subscribe({
+    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase(), this.page, this.pageSize, !!event).subscribe({
       next: (data) => {
-        this.articles = data;
-        this.loading = false;
-        if (event) event.target.complete();
+        setTimeout(() => {
+          this.articles = data;
+          this.loading = false;
+          if (event) event.target.complete();
+          
+          if (data.length < this.pageSize && this.infiniteScroll) {
+            this.infiniteScroll.disabled = true;
+          }
+        }, 1500); 
       },
       error: async (err) => {
         console.error(err);
-        this.loading = false;
-        if (event) event.target.complete();
+        
+        setTimeout(async () => {
+          this.loading = false;
+          if (event) event.target.complete();
 
-        const toast = await this.toastCtrl.create({
-          message: `Error loading news: ${err.message || 'Check connection'}`,
-          duration: 4000,
-          color: 'danger',
-          position: 'bottom',
-          icon: 'alert-circle-outline'
-        });
-        await toast.present();
+          await Haptics.notification({ type: NotificationType.Error });
+
+          const toast = await this.toastCtrl.create({
+            message: `Error loading news: ${err.message || 'Check connection'}`,
+            duration: 4000,
+            color: 'danger',
+            position: 'bottom',
+            icon: 'alert-circle-outline'
+          });
+          await toast.present();
+        }, 1500);
       }
     });
   }
 
-  // Convertimos a async para usar await con Haptics
-  async selectCategory(category: string) {
-    // Haptic ligero al tocar un chip de categoría
+  async loadMoreNews(event: any) {
     await Haptics.impact({ style: ImpactStyle.Light });
+    
+    this.page++;
+    this.loadingMore = true; 
+    const region = this.getRegionCode();
+
+    this.newsService.getTopHeadlines(region, this.selectedCategory.toLowerCase(), this.page, this.pageSize, false).subscribe({
+      next: (data) => {
+        
+        setTimeout(() => {
+          if (data.length > 0) {
+            this.articles = [...this.articles, ...data];
+          }
+          
+          this.loadingMore = false; 
+          event.target.complete();
+
+          if (data.length < this.pageSize || this.articles.length >= 100) {
+            event.target.disabled = true;
+          }
+        }, 1500);
+      },
+      error: async (err) => {
+        console.error(err);
+        setTimeout(async () => {
+          this.loadingMore = false;
+          event.target.complete();
+          event.target.disabled = true;
+          
+          await Haptics.notification({ type: NotificationType.Error });
+        }, 1500);
+      }
+    });
+  }
+
+  async retryLoading() {
+    await Haptics.impact({ style: ImpactStyle.Medium });
+    this.loading = true;
+    this.articles = [];
+    this.loadNews();
+  }
+
+  async selectCategory(category: string) {
+    await Haptics.impact({ style: ImpactStyle.Light });
+    
+    
+    if (this.content) {
+      this.content.scrollToTop(400); 
+    }
 
     this.selectedCategory = category;
     this.loading = true;
@@ -100,20 +177,19 @@ export class NewsPage implements OnInit {
     this.loadNews();
   }
 
-  // Convertimos a async para usar await con Haptics
   async openDetail(article: Article) {
-    // Haptic medio al entrar a leer un artículo
     await Haptics.impact({ style: ImpactStyle.Medium });
-
     this.newsService.setCurrentArticle(article);
     this.router.navigate(['/news-detail']);
   }
 
-  goToProfile() {
+  async goToProfile() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     this.router.navigate(['/tabs/profile']);
   }
 
   async openNotifications() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     const modal = await this.modalCtrl.create({
       component: NotificationsModal,
       breakpoints: [0, 0.5, 0.85],

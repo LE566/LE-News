@@ -18,7 +18,6 @@
 <ion-content [fullscreen]="true" class="news-content">
   <div class="background-blob"></div>
 
-  <!-- Category Scroll -->
   <div class="category-scroll">
     @for (cat of categories; track cat) {
     <div class="category-chip" [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">
@@ -28,8 +27,7 @@
   </div>
 
   <ion-refresher slot="fixed" (ionRefresh)="loadNews($event)">
-    <ion-refresher-content pullingIcon="chevron-down-circle-outline"
-      refreshingSpinner="circles"></ion-refresher-content>
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="circles"></ion-refresher-content>
   </ion-refresher>
 
   <div class="news-wrapper ion-padding">
@@ -38,7 +36,6 @@
       <h2>Top Headlines</h2>
     </div>
 
-    <!-- Featured Article (First item) -->
     @if (articles.length > 0) {
     <div class="featured-article" (click)="openDetail(articles[0])">
       <div class="featured-image"
@@ -58,7 +55,6 @@
     </div>
     }
 
-    <!-- Trending Label -->
     @if (articles.length > 1) {
     <div class="trending-label">
       <ion-icon name="newspaper-outline"></ion-icon>
@@ -66,10 +62,9 @@
     </div>
     }
 
-    <!-- Grid for remaining items -->
     <div class="news-grid">
       @for (article of articles.slice(1); track article.url; let i = $index) {
-      <ion-card (click)="openDetail(article)" class="news-card" [style.--animation-order]="i">
+      <ion-card (click)="openDetail(article)" class="news-card" [style.--animation-order]="i < 4 ? i : 0">
         @if (article.urlToImage) {
         <div class="card-image-wrapper">
           <img [src]="article.urlToImage" loading="lazy" />
@@ -84,9 +79,25 @@
         </ion-card-header>
       </ion-card>
       }
+
+      @if (loadingMore) {
+        @for (i of [1,2]; track i) {
+        <ion-card class="news-card skeleton-card">
+          <ion-skeleton-text [animated]="true" style="width: 100%; height: 160px;"></ion-skeleton-text>
+          
+          <ion-card-header>
+            <div class="source-row" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <ion-skeleton-text [animated]="true" style="width: 35%; height: 18px; border-radius: 12px;"></ion-skeleton-text>
+              <ion-skeleton-text [animated]="true" style="width: 20%; height: 14px; border-radius: 4px;"></ion-skeleton-text>
+            </div>
+            <ion-skeleton-text [animated]="true" style="width: 95%; height: 20px; margin-top: 8px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" style="width: 70%; height: 20px; margin-top: 4px; border-radius: 4px;"></ion-skeleton-text>
+          </ion-card-header>
+        </ion-card>
+        }
+      }
     </div>
 
-    <!-- Empty State -->
     @if (!loading && articles.length === 0) {
     <div class="empty-state">
       <div class="empty-icon-wrapper">
@@ -94,29 +105,45 @@
       </div>
       <h3>No news available</h3>
       <p>Pull down to refresh or try a different category</p>
-      <ion-button fill="outline" shape="round" size="small" (click)="loadNews()">
+      <ion-button fill="outline" shape="round" size="small" (click)="retryLoading()">
         Try Again
       </ion-button>
     </div>
     }
 
-    <!-- Loading Skeletons -->
     @if (loading) {
-    <div class="news-grid">
-      @for (i of [1,2,3,4,5,6]; track i) {
-      <ion-card class="news-card skeleton-card">
-        <ion-skeleton-text [animated]="true" style="width: 100%; height: 160px;"></ion-skeleton-text>
-        <ion-card-header>
-          <ion-skeleton-text [animated]="true" style="width: 30%; height: 14px;"></ion-skeleton-text>
-          <ion-skeleton-text [animated]="true" style="width: 90%; height: 18px; margin-top: 12px;"></ion-skeleton-text>
-          <ion-skeleton-text [animated]="true" style="width: 60%; height: 18px; margin-top: 6px;"></ion-skeleton-text>
-        </ion-card-header>
-      </ion-card>
-      }
+    <div class="skeleton-wrapper">
+      <div class="featured-article skeleton-featured" style="margin-bottom: 20px;">
+        <ion-skeleton-text [animated]="true" style="width: 100%; height: 240px; border-radius: 20px;"></ion-skeleton-text>
+      </div>
+
+      <div class="trending-label" style="margin-bottom: 15px;">
+        <ion-skeleton-text [animated]="true" style="width: 40%; height: 24px; border-radius: 8px;"></ion-skeleton-text>
+      </div>
+
+      <div class="news-grid">
+        @for (i of [1,2,3,4]; track i) {
+        <ion-card class="news-card skeleton-card">
+          <ion-skeleton-text [animated]="true" style="width: 100%; height: 160px;"></ion-skeleton-text>
+          
+          <ion-card-header>
+            <div class="source-row" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <ion-skeleton-text [animated]="true" style="width: 35%; height: 18px; border-radius: 12px;"></ion-skeleton-text>
+              <ion-skeleton-text [animated]="true" style="width: 20%; height: 14px; border-radius: 4px;"></ion-skeleton-text>
+            </div>
+            <ion-skeleton-text [animated]="true" style="width: 95%; height: 20px; margin-top: 8px; border-radius: 4px;"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" style="width: 70%; height: 20px; margin-top: 4px; border-radius: 4px;"></ion-skeleton-text>
+          </ion-card-header>
+        </ion-card>
+        }
+      </div>
     </div>
     }
 
-
-
   </div>
+
+  <ion-infinite-scroll (ionInfinite)="loadMoreNews($event)">
+    <ion-infinite-scroll-content loadingSpinner="none" loadingText=""></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
 </ion-content>

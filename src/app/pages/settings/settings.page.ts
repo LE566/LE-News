@@ -6,6 +6,10 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CustomAlertService } from '../../shared/custom-alert.service';
 import { BookmarksService } from '../../core/services/bookmarks.service';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Geolocation } from '@capacitor/geolocation';
+import { addIcons } from 'ionicons';
+import { locateOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-settings',
@@ -22,7 +26,6 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
     <ion-content class="settings-content">
       <div class="settings-wrapper ion-padding">
 
-        <!-- Appearance -->
         <div class="section-title">
           <ion-icon name="color-palette-outline"></ion-icon>
           <span>Appearance</span>
@@ -48,7 +51,6 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
           </ion-item>
         </div>
 
-        <!-- News Preferences -->
         <div class="section-title">
           <ion-icon name="newspaper-outline"></ion-icon>
           <span>News Preferences</span>
@@ -60,6 +62,15 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
             <ion-label>
               <h2>Region</h2>
               <p>{{ getRegionFlag(selectedRegionCode) }} {{ getRegionName(selectedRegionCode) }}</p>
+            </ion-label>
+            <ion-icon name="chevron-forward-outline" slot="end" class="chevron-icon"></ion-icon>
+          </ion-item>
+
+          <ion-item lines="none" class="settings-item" button="true" (click)="autoDetectRegion()">
+            <ion-icon name="locate-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h2>Auto-detect Location</h2>
+              <p>Set region using GPS</p>
             </ion-label>
             <ion-icon name="chevron-forward-outline" slot="end" class="chevron-icon"></ion-icon>
           </ion-item>
@@ -83,7 +94,6 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
           </ion-item>
         </div>
 
-        <!-- Data Management -->
         <div class="section-title">
           <ion-icon name="server-outline"></ion-icon>
           <span>Data Management</span>
@@ -118,7 +128,6 @@ import { BookmarksService } from '../../core/services/bookmarks.service';
           </ion-item>
         </div>
 
-        <!-- About App -->
         <div class="section-title">
           <ion-icon name="information-circle-outline"></ion-icon>
           <span>About</span>
@@ -305,10 +314,11 @@ export class SettingsPage implements OnInit {
     private alertService: CustomAlertService,
     private bookmarksService: BookmarksService,
     private toastCtrl: ToastController
-  ) { }
+  ) {
+    addIcons({ locateOutline });
+  }
 
   ngOnInit() {
-    // Load saved preferences
     this.darkMode = localStorage.getItem('le_news_dark_mode') === 'true';
     this.textSize = (localStorage.getItem('le_news_text_size') as any) || 'medium';
     this.selectedRegionCode = localStorage.getItem('le_news_region') || 'us';
@@ -316,17 +326,16 @@ export class SettingsPage implements OnInit {
     this.loadImages = localStorage.getItem('le_news_load_images') !== 'false';
     this.bookmarkCount = this.bookmarksService.getCount();
 
-    // Apply saved dark mode
     this.applyDarkMode();
     this.applyTextSize();
 
-    // Subscribe to bookmark changes
     this.bookmarksService.bookmarks.subscribe(() => {
       this.bookmarkCount = this.bookmarksService.getCount();
     });
   }
 
-  toggleDarkMode() {
+  async toggleDarkMode() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     localStorage.setItem('le_news_dark_mode', String(this.darkMode));
     this.applyDarkMode();
   }
@@ -341,11 +350,13 @@ export class SettingsPage implements OnInit {
     document.body.classList.add('text-' + this.textSize);
   }
 
-  savePreference(key: string, value: boolean) {
+  async savePreference(key: string, value: boolean) {
+    await Haptics.impact({ style: ImpactStyle.Light });
     localStorage.setItem(key, String(value));
   }
 
   async changeTextSize() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     const result = await this.alertService.radio({
       icon: 'text-outline',
       title: 'Text Size',
@@ -367,6 +378,7 @@ export class SettingsPage implements OnInit {
   }
 
   async changeRegion() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     const result = await this.alertService.radio({
       icon: 'globe-outline',
       title: 'News Region',
@@ -386,7 +398,53 @@ export class SettingsPage implements OnInit {
     }
   }
 
+  async autoDetectRegion() {
+    await Haptics.impact({ style: ImpactStyle.Medium });
+    
+    try {
+      // ✨ 1. Verificar y pedir permisos PRIMERO
+      const permissions = await Geolocation.checkPermissions();
+      
+      if (permissions.location !== 'granted') {
+        const request = await Geolocation.requestPermissions();
+        if (request.location !== 'granted') {
+          this.showToast('Location permission denied by user.');
+          return; // Detenemos la función si el usuario dice que no
+        }
+      }
+
+      this.showToast('Detecting location...');
+      
+      // ✨ 2. Ahora sí, obtenemos la posición
+      const coordinates = await Geolocation.getCurrentPosition();
+      const lat = coordinates.coords.latitude;
+      const lng = coordinates.coords.longitude;
+
+      // 3. Convertir a país
+      const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+      const data = await response.json();
+      
+      const countryCode = data.countryCode.toLowerCase();
+      const matchedRegion = this.regions.find(r => r.code === countryCode);
+
+      if (matchedRegion) {
+        this.selectedRegionCode = matchedRegion.code;
+        localStorage.setItem('le_news_region', matchedRegion.code);
+        
+        await Haptics.notification({ type: 'SUCCESS' } as any);
+        this.showToast(`Region updated to ${matchedRegion.name} ${matchedRegion.flag}`);
+      } else {
+        this.showToast("Country not supported for news yet.");
+      }
+
+    } catch (error) {
+      console.error('Error getting location', error);
+      this.showToast('Could not access GPS. Check phone settings.');
+    }
+  }
+
   async clearCache() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     const confirmed = await this.alertService.confirm({
       icon: 'trash-outline',
       title: 'Clear Cache',
@@ -396,13 +454,13 @@ export class SettingsPage implements OnInit {
     });
 
     if (confirmed) {
-      // Clear session storage and any cached data
       sessionStorage.clear();
       this.showToast('Cache cleared successfully');
     }
   }
 
   async clearBookmarks() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     if (this.bookmarkCount === 0) {
       await this.alertService.info({
         icon: 'bookmark-outline',
@@ -430,6 +488,7 @@ export class SettingsPage implements OnInit {
   }
 
   async resetSettings() {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
     const confirmed = await this.alertService.confirm({
       icon: 'refresh-outline',
       title: 'Reset Settings',
@@ -439,7 +498,6 @@ export class SettingsPage implements OnInit {
     });
 
     if (confirmed) {
-      // Reset all preferences
       this.darkMode = false;
       this.textSize = 'medium';
       this.selectedRegionCode = 'us';
@@ -459,6 +517,7 @@ export class SettingsPage implements OnInit {
   }
 
   async showAbout() {
+    await Haptics.impact({ style: ImpactStyle.Light });
     await this.alertService.info({
       icon: 'heart-outline',
       title: 'LE News',
